@@ -1,0 +1,2 @@
+root: C:\Users\NIT\Desktop\ehr_bc
+path: C:\Program Files\nodejs
