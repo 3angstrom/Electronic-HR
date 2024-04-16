@@ -1,36 +1,52 @@
-import { string } from "hardhat/internal/core/params/argumentTypes"
-import { useState } from "react"
+import React, { useState, useEffect } from 'react';
+import { getFileFromIPFS } from '../IPFS';
 
-const Admin = (account) => {
+function Admin() {
+  const [patientData, setPatientData] = useState(null);
+  const [ipfsHash, setIpfsHash] = useState('');
 
-  const [formData, setFormData] = useState({
-    id : null,
-    info : string
-  })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getFileFromIPFS(ipfsHash);
+        setPatientData(JSON.parse(data));
+      } catch (error) {
+        console.error('Error fetching patient data:', error);
+      }
+    };
 
+    if (ipfsHash) {
+      fetchData();
+    }
+  }, [ipfsHash]);
 
-  const handleSubmit = () => {
-
-  }
-
-  const handleChange = (e) => {
-    setFormData({
-        ...formData,
-        [e.target.name]: e.target.value
-    });
-  }
+  const handleInputChange = (e) => {
+    setIpfsHash(e.target.value);
+  };
 
   return (
     <div>
-      <form onSubmit={handleChange}>
-        <label>Doctor Id: </label>
-        <input type="text" onChange={handleChange} name="id" value={formData.id} /> <br />
-        <label>Doctor Info:</label>
-        <input type="text" onChange={handleChange} name="info" value={formData.info} />
-      </form>
+      <h2>Admin</h2>
+      <div>
+        <label>IPFS Hash:</label>
+        <input
+          type="text"
+          value={ipfsHash}
+          onChange={handleInputChange}
+          placeholder="Enter IPFS Hash"
+        />
+      </div>
+      {patientData && (
+        <div>
+          <h3>Patient Data</h3>
+          <p>Name: {patientData.name}</p>
+          <p>Age: {patientData.age}</p>
+          <p>Sex: {patientData.sex}</p>
+          <p>Description: {patientData.description}</p>
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-
-export default Admin
+export default Admin;

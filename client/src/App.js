@@ -1,12 +1,22 @@
+import './App.css';
 import React, { useEffect, useState } from 'react';
 import CopyrightArtifact from "../src/artifacts/contracts/EHR.sol/EHR.json";
 import { ethers } from "ethers";
- //import Admin from './components/Admin';
+// import web3 from web3;
 
 function App() {
   const [account, setAccount] = useState("");
   const [contract, setContract] = useState(null);
   const [provider, setProvider] = useState(null);
+  const [role, setRole] = useState("");
+  const [doctorId, setDoctorId] = useState("");
+  const [doctorInfoHash, setDoctorInfoHash] = useState("");
+  const [patientName, setPatientName] = useState("");
+  const [patientAge, setPatientAge] = useState("");
+  const [patientSex, setPatientSex] = useState("");
+  const [patientDescription, setPatientDescription] = useState("");
+  const [patientIpfsHash, setPatientIpfsHash] = useState("");
+  const [patients, setPatients] = useState([]);
 
   useEffect(() => {
     const loadProvider = async () => {
@@ -27,7 +37,17 @@ function App() {
           const address = await signer.getAddress();
           setAccount(address);
 
-          const contractAddress = "0x1ae9b27362f20980B7a21E548184820b71c15B9d";
+
+
+
+
+          //"0x126a3e361B49Bb6c2A79503306E5B2b512ca76A4"
+
+
+
+
+
+          const contractAddress = "0x126a3e361B49Bb6c2A79503306E5B2b512ca76A4";
           const contract = new ethers.Contract(
             contractAddress,
             CopyrightArtifact.abi,
@@ -48,11 +68,121 @@ function App() {
     loadProvider();
   }, []);
 
+  const handleRoleSelection = (selectedRole) => {
+    setRole(selectedRole);
+  };
+
+  const handleAddDoctor = async () => {
+    try {
+      await contract.addDoctor(doctorId, doctorInfoHash);
+      console.log("Doctor added successfully");
+    } catch (error) {
+      console.error("Error adding doctor:", error);
+    }
+  };
+
+  const handleAddPatient = async () => {
+    try {
+      await contract.addPatient(
+        patientName,
+        patientAge,
+        patientSex,
+        patientDescription,
+        patientIpfsHash
+      );
+      console.log("Patient added successfully");
+    } catch (error) {
+      console.error("Error adding patient:", error);
+    }
+  };
+
+  const handleGetAllPatients = async () => {
+    try {
+      const patientIds = await contract.getAllPatients();
+      setPatients(patientIds);
+    } catch (error) {
+      console.error("Error getting all patients:", error);
+    }
+  };
+
   return (
     <div className="App">
       <h1>Blockchain EHR</h1>
-      <p>Account: {account ? account : "Connect with Metamask"}</p>
-     
+      <p>Account: {account ? account : "Connect with MetaMask"}</p>
+
+      {account && (
+        <div>
+          <h2>Select Your Role</h2>
+          <button onClick={() => handleRoleSelection("admin")}>Admin</button>
+          <button onClick={() => handleRoleSelection("doctor")}>Doctor</button>
+        </div>
+      )}
+
+      {role === "admin" && (
+        <div>
+          <h2>Admin View</h2>
+          <h3>Add Doctor</h3>
+          <input
+            type="text"
+            placeholder="Doctor Address"
+            value={doctorId}
+            onChange={(e) => setDoctorId(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Doctor Info Hash"
+            value={doctorInfoHash}
+            onChange={(e) => setDoctorInfoHash(e.target.value)}
+          />
+          <button onClick={handleAddDoctor}>Add Doctor</button>
+
+          <h3>View All Patients</h3>
+          <button onClick={handleGetAllPatients}>Get All Patients</button>
+          <ul>
+            {patients.map((patientId, index) => (
+              <li key={index}>{patientId}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {role === "doctor" && (
+        <div>
+          <h2>Doctor View</h2>
+          <h3>Add Patient</h3>
+          <input
+            type="text"
+            placeholder="Patient Name"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Patient Age"
+            value={patientAge}
+            onChange={(e) => setPatientAge(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Patient Sex"
+            value={patientSex}
+            onChange={(e) => setPatientSex(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Patient Description"
+            value={patientDescription}
+            onChange={(e) => setPatientDescription(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Patient IPFS Hash"
+            value={patientIpfsHash}
+            onChange={(e) => setPatientIpfsHash(e.target.value)}
+          />
+          <button onClick={handleAddPatient}>Add Patient</button>
+        </div>
+      )}
     </div>
   );
 }
