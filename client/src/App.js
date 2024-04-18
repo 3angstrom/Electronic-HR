@@ -1,8 +1,7 @@
-import './App.css';
 import React, { useEffect, useState } from 'react';
-import CopyrightArtifact from "../src/artifacts/contracts/EHR.sol/EHR.json";
 import { ethers } from "ethers";
-// import web3 from web3;
+import CopyrightArtifact from "../src/artifacts/contracts/EHR.sol/EHR.json";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [account, setAccount] = useState("");
@@ -37,16 +36,6 @@ function App() {
           const address = await signer.getAddress();
           setAccount(address);
 
-
-
-
-
-          //"0x126a3e361B49Bb6c2A79503306E5B2b512ca76A4"
-
-
-
-
-
           const contractAddress = "0x126a3e361B49Bb6c2A79503306E5B2b512ca76A4";
           const contract = new ethers.Contract(
             contractAddress,
@@ -54,14 +43,13 @@ function App() {
             signer
           );
 
-          console.log(contract);
           setContract(contract);
           setProvider(provider);
         } catch (error) {
           console.error("Error loading provider:", error);
         }
       } else {
-        console.log("Metamask not detected");
+        console.log("MetaMask not detected");
       }
     };
 
@@ -106,81 +94,97 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1>Blockchain EHR</h1>
+    <div className="container mt-5">
+      <h1 className="text-center">Blockchain EHR</h1>
       <p>Account: {account ? account : "Connect with MetaMask"}</p>
 
       {account && (
         <div>
-          <h2>Select Your Role</h2>
-          <button onClick={() => handleRoleSelection("admin")}>Admin</button>
-          <button onClick={() => handleRoleSelection("doctor")}>Doctor</button>
+          <h2 className="text-center">Select Your Role</h2>
+          <div className="d-flex justify-content-center">
+            <button className="btn btn-primary mx-2" onClick={() => handleRoleSelection("admin")}>Admin</button>
+            <button className="btn btn-primary mx-2" onClick={() => handleRoleSelection("doctor")}>Doctor</button>
+          </div>
         </div>
       )}
 
       {role === "admin" && (
-        <div>
-          <h2>Admin View</h2>
-          <h3>Add Doctor</h3>
-          <input
-            type="text"
-            placeholder="Doctor Address"
-            value={doctorId}
-            onChange={(e) => setDoctorId(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Doctor Info Hash"
-            value={doctorInfoHash}
-            onChange={(e) => setDoctorInfoHash(e.target.value)}
-          />
-          <button onClick={handleAddDoctor}>Add Doctor</button>
-
-          <h3>View All Patients</h3>
-          <button onClick={handleGetAllPatients}>Get All Patients</button>
-          <ul>
-            {patients.map((patientId, index) => (
-              <li key={index}>{patientId}</li>
-            ))}
-          </ul>
+        <div className="mt-5">
+          <h2 className="text-center">Admin View</h2>
+          <div className="row">
+            <div className="col-md-6">
+              <h3>Add Doctor</h3>
+              <input
+                type="text"
+                className="form-control mb-2"
+                placeholder="Doctor Address"
+                value={doctorId}
+                onChange={(e) => setDoctorId(e.target.value)}
+              />
+              <input
+                type="text"
+                className="form-control mb-2"
+                placeholder="Doctor Info Hash"
+                value={doctorInfoHash}
+                onChange={(e) => setDoctorInfoHash(e.target.value)}
+              />
+              <button className="btn btn-success" onClick={handleAddDoctor}>Add Doctor</button>
+            </div>
+            <div className="col-md-6">
+              <h3>View All Patients</h3>
+              <button className="btn btn-info mb-3" onClick={handleGetAllPatients}>Get All Patients</button>
+              <ul className="list-group">
+                {patients.map((patientId, index) => (
+                  <li key={index} className="list-group-item">{patientId}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
       {role === "doctor" && (
-        <div>
-          <h2>Doctor View</h2>
-          <h3>Add Patient</h3>
-          <input
-            type="text"
-            placeholder="Patient Name"
-            value={patientName}
-            onChange={(e) => setPatientName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Patient Age"
-            value={patientAge}
-            onChange={(e) => setPatientAge(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Patient Sex"
-            value={patientSex}
-            onChange={(e) => setPatientSex(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Patient Description"
-            value={patientDescription}
-            onChange={(e) => setPatientDescription(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Patient IPFS Hash"
-            value={patientIpfsHash}
-            onChange={(e) => setPatientIpfsHash(e.target.value)}
-          />
-          <button onClick={handleAddPatient}>Add Patient</button>
+        <div className="mt-5">
+          <h2 className="text-center">Doctor View</h2>
+          <div className="col-md-6 mx-auto">
+            <h3>Add Patient</h3>
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Patient Name"
+              value={patientName}
+              onChange={(e) => setPatientName(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Patient Age"
+              value={patientAge}
+              onChange={(e) => setPatientAge(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Patient Sex"
+              value={patientSex}
+              onChange={(e) => setPatientSex(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Patient Description"
+              value={patientDescription}
+              onChange={(e) => setPatientDescription(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Patient IPFS Hash"
+              value={patientIpfsHash}
+              onChange={(e) => setPatientIpfsHash(e.target.value)}
+            />
+            <button className="btn btn-success" onClick={handleAddPatient}>Add Patient</button>
+          </div>
         </div>
       )}
     </div>
