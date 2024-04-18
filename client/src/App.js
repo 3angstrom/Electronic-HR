@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ethers } from "ethers";
 import CopyrightArtifact from "../src/artifacts/contracts/EHR.sol/EHR.json";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { create } from 'ipfs-http-client';
 
 function App() {
   const [account, setAccount] = useState("");
@@ -14,8 +15,10 @@ function App() {
   const [patientAge, setPatientAge] = useState("");
   const [patientSex, setPatientSex] = useState("");
   const [patientDescription, setPatientDescription] = useState("");
-  const [patientIpfsHash, setPatientIpfsHash] = useState("");
+  const [ipfsHash, setIpfsHash] = useState("");
   const [patients, setPatients] = useState([]);
+
+  const ipfs = create('https://ipfs.infura.io:5001/api/v0');
 
   useEffect(() => {
     const loadProvider = async () => {
@@ -36,7 +39,7 @@ function App() {
           const address = await signer.getAddress();
           setAccount(address);
 
-          const contractAddress = "0x126a3e361B49Bb6c2A79503306E5B2b512ca76A4";
+          const contractAddress = "0xCA6bDA64E427d8e6C45B49518f3A13a44C3101e4";
           const contract = new ethers.Contract(
             contractAddress,
             CopyrightArtifact.abi,
@@ -60,6 +63,20 @@ function App() {
     setRole(selectedRole);
   };
 
+  const handleFileUpload = async (event) => {
+    event.preventDefault();
+
+    const file = event.target.files[0];
+    try {
+      const added = await ipfs.add(file);
+      const hash = added.cid.toString();
+      setIpfsHash(hash);
+      console.log(`IPFS hash: ${hash}`);
+    } catch (error) {
+      console.error("Error uploading file to IPFS:", error);
+    }
+  };
+
   const handleAddDoctor = async () => {
     try {
       await contract.addDoctor(doctorId, doctorInfoHash);
@@ -76,7 +93,7 @@ function App() {
         patientAge,
         patientSex,
         patientDescription,
-        patientIpfsHash
+        ipfsHash
       );
       console.log("Patient added successfully");
     } catch (error) {
@@ -177,11 +194,9 @@ function App() {
               onChange={(e) => setPatientDescription(e.target.value)}
             />
             <input
-              type="text"
+              type="file"
               className="form-control mb-2"
-              placeholder="Patient IPFS Hash"
-              value={patientIpfsHash}
-              onChange={(e) => setPatientIpfsHash(e.target.value)}
+              onChange={handleFileUpload}
             />
             <button className="btn btn-success" onClick={handleAddPatient}>Add Patient</button>
           </div>
