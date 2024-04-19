@@ -72,7 +72,7 @@ contract EHR {
         string memory _sex,
         string memory _description,
         string memory _ipfsHash
-    ) public onlyDoctor {
+    ) public onlyPatient {
         Patient storage patientInfo = Patients[msg.sender];
         patientInfo.id = msg.sender;
         patientInfo.name = _name;
